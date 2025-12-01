@@ -1,0 +1,20 @@
+[install]
+# Hoist dependencies to root node_modules  
+# Bun workspaces automatically hoist dependencies
+
+# Use exact versions
+exact = true
+
+[install.cache]
+# Cache directory
+dir = "~/.bun/install/cache"
+
+# Disable cache
+disable = false
+
+[test]
+# Test coverage
+coverage = false
+
+# Preload test files
+preload = []
