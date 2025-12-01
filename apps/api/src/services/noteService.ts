@@ -317,8 +317,22 @@ import { logger } from '../utils/logger';
 
 const aiProvider = createAIProvider();
 
+// Extended interface for in-memory storage
+interface StoredRevision {
+  status: 'queued' | 'processing' | 'done' | 'failed';
+  result?: NoteResult;
+  cached: boolean;
+  createdAt: Date;
+  processedAt?: Date;
+  exportMarkdown?: string;
+  exportHtml?: string;
+  exportText?: string;
+  modelUsed?: string;
+  error?: string;
+}
+
 // In-memory storage (temporary, no PostgreSQL)
-const inMemoryRevisions = new Map<string, NoteResult>();
+const inMemoryRevisions = new Map<string, StoredRevision>();
 const inMemoryCache = new Map<string, string>();
 
 export async function createNote(
@@ -334,7 +348,7 @@ export async function createNote(
   // Check cache if enabled
   if (options.useCached !== false) {
     console.log('[SERVICE] Checking in-memory cache...');
-    const cacheKey = generateCacheKey(userId, rawText, options);
+    const cacheKey = generateCacheKey(userId, rawText, options as Record<string, unknown>);
     const cachedRevisionId = inMemoryCache.get(cacheKey);
 
     if (cachedRevisionId) {
@@ -416,7 +430,7 @@ export async function processNoteJob(data: {
     });
 
     // Cache result
-    const cacheKey = generateCacheKey(userId, rawText, options);
+    const cacheKey = generateCacheKey(userId, rawText, options as Record<string, unknown>);
     inMemoryCache.set(cacheKey, revisionId);
 
     logger.info('Note processing completed (in-memory)', { revisionId });
@@ -426,7 +440,7 @@ export async function processNoteJob(data: {
     const revision = inMemoryRevisions.get(revisionId);
     if (revision) {
       revision.status = 'failed';
-      revision.error = error;
+      revision.error = error instanceof Error ? error.message : String(error);
     }
     throw error;
   }
@@ -485,6 +499,11 @@ export async function getRevisionResult(revisionId: string): Promise<
     throw new Error('Revision not ready');
   }
 
+  if (!revision.result) {
+    console.log('[SERVICE] ERROR: Revision result is missing');
+    throw new Error('Revision result not found');
+  }
+
   console.log('[SERVICE] Revision result exists:', !!revision.result);
   console.log(
     '[SERVICE] Result structure:',
@@ -498,7 +517,12 @@ export async function getRevisionResult(revisionId: string): Promise<
       : null
   );
 
-  const returnValue = {
+  const returnValue: NoteResult & {
+    modelUsed?: string;
+    cached?: boolean;
+    createdAt: string;
+    processedAt?: string;
+  } = {
     ...revision.result,
     modelUsed: revision.modelUsed,
     cached: revision.cached,

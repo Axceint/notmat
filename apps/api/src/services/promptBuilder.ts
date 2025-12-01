@@ -1,7 +1,7 @@
 import { NoteOptions } from '../types/note';
 
 export function buildPrompt(options: NoteOptions): string {
-  const toneInstructions = getToneInstructions(options.tone);
+  const toneInstructions = getToneInstructions(options.tone || 'original');
 
   return `You are an expert note transformation AI. Your task is to transform raw, unstructured plain-text notes into a hierarchical, task-based structure with metadata extraction.
 

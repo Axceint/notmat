@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as noteService from '../services/noteService';
 
 export async function invalidateCache(
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {

@@ -53,7 +53,7 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 
 // CORS preflight logging
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   if (req.method === 'OPTIONS') {
     console.log('[CORS] Preflight request from origin:', req.get('origin'));
     console.log('[CORS] Requested headers:', req.get('access-control-request-headers'));
@@ -63,7 +63,7 @@ app.use((req, res, next) => {
 });
 
 // Request logging
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   console.log(`[REQUEST] ${req.method} ${req.path} from ${req.get('origin') || 'no-origin'}`);
   logger.info(`${req.method} ${req.path}`, {
     ip: req.ip,
@@ -73,7 +73,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.json({
     status: 'ok',
     message: 'notmat API',
@@ -82,7 +82,7 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
