@@ -35,7 +35,7 @@ export default function DashboardPage() {
             revisionId: rev.revisionId,
             title: result.meta.userProvidedTitle || rev.title || 'Untitled Note',
             createdAt: result.createdAt,
-            cached: result.cached,
+            cached: result.cached ?? false,
             status: 'done' as const,
           };
         } catch (err) {
@@ -45,7 +45,7 @@ export default function DashboardPage() {
             title: rev.title || 'Untitled Note',
             createdAt: rev.createdAt,
             cached: false,
-            status: 'unknown' as const,
+            status: 'failed' as const,
           };
         }
       });
