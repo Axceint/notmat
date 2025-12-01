@@ -1,5 +1,8 @@
 'use client';
 
+
+
+import type { NoteOptions } from '@/types/note';
 import { useRouter } from 'next/navigation';
 import { useSettingsStore } from '@/store/settingsStore';
 import { ArrowLeft, Save } from 'lucide-react';
